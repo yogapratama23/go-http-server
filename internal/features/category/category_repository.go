@@ -9,8 +9,8 @@ import (
 
 type CategoryRepository struct{}
 
-func (r *CategoryRepository) FindAll() (*[]models.Category, error) {
-	var categories []models.Category
+func (r *CategoryRepository) FindAll() (*[]ListCategory, error) {
+	var categories []ListCategory
 	query := `
 		SELECT
 			id, name
@@ -27,7 +27,7 @@ func (r *CategoryRepository) FindAll() (*[]models.Category, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var c models.Category
+		var c ListCategory
 		err := rows.Scan(&c.ID, &c.Name)
 		if err != nil {
 			return nil, err
@@ -66,17 +66,19 @@ func (r *CategoryRepository) Create(p *CreateCategoryInput) error {
 	return nil
 }
 
-func (r *CategoryRepository) FindById(id *int) (*models.Category, error) {
-	var c models.Category
+func (r *CategoryRepository) FindById(id *int) (*ListCategory, error) {
+	var c ListCategory
 	query := `
 		SELECT
 			id, name
 		FROM
 			categories
 		WHERE
+			deleted_at IS NULL
+		AND
 			id = ?;
 	`
-	err := db.Connect.QueryRow(query, 1).Scan(&c.ID, &c.Name)
+	err := db.Connect.QueryRow(query, id).Scan(&c.ID, &c.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -84,14 +86,16 @@ func (r *CategoryRepository) FindById(id *int) (*models.Category, error) {
 	return &c, nil
 }
 
-func (r *CategoryRepository) FindByName(n *string) (*models.Category, error) {
-	var c models.Category
+func (r *CategoryRepository) FindByName(n *string) (*ListCategory, error) {
+	var c ListCategory
 	query := `
 		SELECT
 			id, name
 		FROM
 			categories
 		WHERE
+			deleted_at IS NULL
+		AND
 			name LIKE CONCAT ('%', ?, '%');
 	`
 	err := db.Connect.QueryRow(query, n).Scan(&c.ID, &c.Name)

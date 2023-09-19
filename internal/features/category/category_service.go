@@ -2,15 +2,13 @@ package category
 
 import (
 	"strconv"
-
-	"github.com/yogapratama23/go-http-server/internal/models"
 )
 
 type CategoryService struct {
 	categoryRepo CategoryRepository
 }
 
-func (s *CategoryService) FindAll() (*[]models.Category, error) {
+func (s *CategoryService) FindAll() (*[]ListCategory, error) {
 	categories, err := s.categoryRepo.FindAll()
 	if err != nil {
 		return nil, err
@@ -28,7 +26,7 @@ func (s *CategoryService) Create(p *CreateCategoryInput) error {
 	return nil
 }
 
-func (s *CategoryService) FindById(id string) (*models.Category, error) {
+func (s *CategoryService) FindById(id string) (*ListCategory, error) {
 	i, _ := strconv.Atoi(id)
 	c, err := s.categoryRepo.FindById(&i)
 	if err != nil {
@@ -38,7 +36,7 @@ func (s *CategoryService) FindById(id string) (*models.Category, error) {
 	return c, nil
 }
 
-func (s *CategoryService) FindByName(n *string) (*models.Category, error) {
+func (s *CategoryService) FindByName(n *string) (*ListCategory, error) {
 	c, err := s.categoryRepo.FindByName(n)
 	if err != nil {
 		return nil, err
