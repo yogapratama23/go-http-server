@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
 type CategoryController struct {
@@ -22,35 +23,17 @@ func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request
 	var payload CreateCategoryInput
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		resp, _ := json.Marshal(map[string]interface{}{
-			"message": err.Error(),
-		})
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(resp)
+		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = c.categoryService.Create(&payload)
 	if err != nil {
-		resp, _ := json.Marshal(map[string]interface{}{
-			"message": err.Error(),
-		})
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(resp)
+		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	resp, _ := json.Marshal(map[string]interface{}{
-		"message": "Create category success!",
-	})
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write(resp)
+	response.Success(w, "Create category success!", http.StatusCreated, nil)
 }
 
 func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Request) {
@@ -60,83 +43,41 @@ func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Reques
 	if id != "" {
 		data, err := c.categoryService.FindById(id)
 		if err != nil {
-			resp, _ := json.Marshal(map[string]interface{}{
-				"message": err.Error(),
-			})
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(resp)
+			response.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		resp, _ := json.Marshal(map[string]interface{}{
-			"message": "Get category success!",
-			"data":    data,
-		})
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(resp)
+		response.Success(w, "Find category by id!", http.StatusOK, data)
 		return
 	}
 
 	if search != "" {
 		data, err := c.categoryService.FindByName(&search)
 		if err != nil {
-			resp, _ := json.Marshal(map[string]interface{}{
-				"message": err.Error(),
-			})
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(resp)
+			response.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		resp, _ := json.Marshal(map[string]interface{}{
-			"message": "Get category success!",
-			"data":    data,
-		})
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(resp)
+		response.Success(w, "Find category by search!", http.StatusOK, data)
 		return
 	}
 
 	data, err := c.categoryService.FindAll()
 	if err != nil {
-		resp, _ := json.Marshal(map[string]interface{}{
-			"message": err.Error(),
-		})
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(resp)
+		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	resp, _ := json.Marshal(map[string]interface{}{
-		"message": "Get all category success!",
-		"data":    data,
-	})
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	response.Success(w, "Find all category!", http.StatusOK, data)
 }
 
 func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	id := vars["id"]
 	err := c.categoryService.SoftDelete(id)
 	if err != nil {
-		resp, _ := json.Marshal(map[string]interface{}{
-			"message": err.Error(),
-		})
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(resp)
+		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -144,7 +85,6 @@ func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request
 		"message": "Delete category success!",
 	})
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	w.Write(resp)
 }
