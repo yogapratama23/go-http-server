@@ -101,3 +101,19 @@ func (r *CategoryRepository) FindByName(n *string) (*models.Category, error) {
 
 	return &c, nil
 }
+
+func (r *CategoryRepository) SoftDelete(id *int) error {
+	_, err := db.Connect.Exec(`
+		UPDATE
+			categories
+		SET
+			deleted_at = ?
+		WHERE
+			id = ?;
+	`, time.Now(), id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

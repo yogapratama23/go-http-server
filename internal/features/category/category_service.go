@@ -46,3 +46,13 @@ func (s *CategoryService) FindByName(n *string) (*models.Category, error) {
 
 	return c, nil
 }
+
+func (s *CategoryService) SoftDelete(id string) error {
+	i, _ := strconv.Atoi(id)
+	err := s.categoryRepo.SoftDelete(&i)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

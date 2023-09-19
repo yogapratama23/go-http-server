@@ -15,6 +15,7 @@ func CategoryRouters(r *mux.Router) {
 	controller := new(CategoryController)
 	r.HandleFunc("/category", controller.handleCreate).Methods("POST")
 	r.HandleFunc("/category", controller.handleFindAll).Methods("GET")
+	r.HandleFunc("/category/{id}", controller.handleDelete).Methods("DELETE")
 }
 
 func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request) {
@@ -121,5 +122,29 @@ func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Reques
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
+func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	err := c.categoryService.SoftDelete(id)
+	if err != nil {
+		resp, _ := json.Marshal(map[string]interface{}{
+			"message": err.Error(),
+		})
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(resp)
+		return
+	}
+
+	resp, _ := json.Marshal(map[string]interface{}{
+		"message": "Delete category success!",
+	})
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	w.Write(resp)
 }
