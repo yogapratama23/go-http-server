@@ -10,12 +10,12 @@ type CategoryService struct {
 	categoryRepo CategoryRepository
 }
 
-func (s *CategoryService) FindAll(p *response.PaginationInput) (*PaginateListCategory, error) {
+func (s *CategoryService) FindAll(p *response.PaginationInput, wc *FindAllWhereCond) (*ListCategoryResponse, error) {
 	if (p.Skip == 0) && (p.Take == 0) {
 		p.Skip = 0
 		p.Take = 10
 	}
-	categories, err := s.categoryRepo.FindAllPaginate(p)
+	categories, err := s.categoryRepo.FindAllPaginate(p, wc)
 	if err != nil {
 		return nil, err
 	}
@@ -30,25 +30,6 @@ func (s *CategoryService) Create(p *CreateCategoryInput) error {
 	}
 
 	return nil
-}
-
-func (s *CategoryService) FindById(id string) (*ListCategory, error) {
-	i, _ := strconv.Atoi(id)
-	c, err := s.categoryRepo.FindById(&i)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
-}
-
-func (s *CategoryService) FindByName(n *string) (*ListCategory, error) {
-	c, err := s.categoryRepo.FindByName(n)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
 }
 
 func (s *CategoryService) SoftDelete(id string) error {
