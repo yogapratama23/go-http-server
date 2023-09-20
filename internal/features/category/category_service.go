@@ -2,14 +2,20 @@ package category
 
 import (
 	"strconv"
+
+	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
 type CategoryService struct {
 	categoryRepo CategoryRepository
 }
 
-func (s *CategoryService) FindAll() (*[]ListCategory, error) {
-	categories, err := s.categoryRepo.FindAll()
+func (s *CategoryService) FindAll(p *response.PaginationInput) (*PaginateListCategory, error) {
+	if (p.Skip == 0) && (p.Take == 0) {
+		p.Skip = 0
+		p.Take = 10
+	}
+	categories, err := s.categoryRepo.FindAllPaginate(p)
 	if err != nil {
 		return nil, err
 	}

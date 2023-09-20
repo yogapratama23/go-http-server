@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+type PaginationInput struct {
+	Skip int `json:"skip"`
+	Take int `json:"take"`
+}
+
 func Error(w http.ResponseWriter, error string, code int) {
 
 	resp, _ := json.Marshal(map[string]interface{}{

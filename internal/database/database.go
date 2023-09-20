@@ -8,6 +8,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type WhereCondition struct{}
+
 var Connect *sql.DB
 
 func Init() {

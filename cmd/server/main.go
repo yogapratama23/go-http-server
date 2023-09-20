@@ -29,7 +29,10 @@ func main() {
 	addr := fmt.Sprintf(":%s", port)
 
 	r := mux.NewRouter()
+
+	// register middlewares
 	r.Use(middlewares.Logging)
+
 	// register routes
 	r.HandleFunc("/", home).Methods("GET")
 	category.CategoryRouters(r)

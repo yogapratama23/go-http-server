@@ -3,26 +3,30 @@ package category
 import (
 	"errors"
 	"log"
+	"math"
 	"time"
 
 	db "github.com/yogapratama23/go-http-server/internal/database"
 	"github.com/yogapratama23/go-http-server/internal/models"
+	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
 type CategoryRepository struct{}
 
-func (r *CategoryRepository) FindAll() (*[]ListCategory, error) {
-	var categories []ListCategory
+func (r *CategoryRepository) FindAllPaginate(p *response.PaginationInput) (*PaginateListCategory, error) {
+	var response PaginateListCategory
 	query := `
 		SELECT
 			id, name
 		FROM
 			categories
 		WHERE
-			deleted_at IS NULL;
+			deleted_at IS NULL
+		LIMIT ?, ?
 	`
 
-	rows, err := db.Connect.Query(query)
+	// query for data
+	rows, err := db.Connect.Query(query, p.Skip, p.Take)
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("error finding list of categories")
@@ -36,7 +40,7 @@ func (r *CategoryRepository) FindAll() (*[]ListCategory, error) {
 			log.Println(err)
 			return nil, errors.New("error finding list of categories")
 		}
-		categories = append(categories, c)
+		response.Categories = append(response.Categories, c)
 	}
 
 	err = rows.Err()
@@ -45,7 +49,18 @@ func (r *CategoryRepository) FindAll() (*[]ListCategory, error) {
 		return nil, errors.New("error finding list of categories")
 	}
 
-	return &categories, nil
+	// query for pagination
+	err = db.Connect.QueryRow("SELECT COUNT(id) FROM categories").Scan(&response.Total)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+
+	response.Page = int(math.Ceil(float64(p.Skip)/float64(p.Take))) + 1
+	response.PerPage = p.Take
+	response.PageCount = int(math.Ceil(float64(response.Total) / float64(p.Take)))
+
+	return &response, nil
 }
 
 func (r *CategoryRepository) Create(p *CreateCategoryInput) error {
@@ -62,7 +77,7 @@ func (r *CategoryRepository) Create(p *CreateCategoryInput) error {
 			)
 		VALUES (
 			?, ?, ?
-		);
+		)
 	`, payload.Name, payload.CreatedAt, payload.UpdatedAt)
 	if err != nil {
 		log.Println(err)
@@ -82,7 +97,7 @@ func (r *CategoryRepository) FindById(id *int) (*ListCategory, error) {
 		WHERE
 			deleted_at IS NULL
 		AND
-			id = ?;
+			id = ?
 	`
 	err := db.Connect.QueryRow(query, id).Scan(&c.ID, &c.Name)
 	if err != nil {
@@ -103,7 +118,7 @@ func (r *CategoryRepository) FindByName(n *string) (*ListCategory, error) {
 		WHERE
 			deleted_at IS NULL
 		AND
-			name LIKE CONCAT ('%', ?, '%');
+			name LIKE CONCAT ('%', ?, '%')
 	`
 	err := db.Connect.QueryRow(query, n).Scan(&c.ID, &c.Name)
 	if err != nil {
@@ -121,7 +136,7 @@ func (r *CategoryRepository) SoftDelete(id *int) error {
 		SET
 			deleted_at = ?
 		WHERE
-			id = ?;
+			id = ?
 	`, time.Now(), id)
 	if err != nil {
 		log.Println(err)

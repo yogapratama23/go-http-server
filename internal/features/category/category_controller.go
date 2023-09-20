@@ -3,6 +3,7 @@ package category
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/yogapratama23/go-http-server/internal/response"
@@ -37,32 +38,15 @@ func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request
 }
 
 func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	search := r.URL.Query().Get("search")
+	skip, _ := strconv.Atoi(r.URL.Query().Get("skip"))
+	take, _ := strconv.Atoi(r.URL.Query().Get("take"))
 
-	if id != "" {
-		data, err := c.categoryService.FindById(id)
-		if err != nil {
-			response.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		response.Success(w, "Find category by id!", http.StatusOK, data)
-		return
+	pagination := response.PaginationInput{
+		Skip: skip,
+		Take: take,
 	}
 
-	if search != "" {
-		data, err := c.categoryService.FindByName(&search)
-		if err != nil {
-			response.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		response.Success(w, "Find category by search!", http.StatusOK, data)
-		return
-	}
-
-	data, err := c.categoryService.FindAll()
+	data, err := c.categoryService.FindAll(&pagination)
 	if err != nil {
 		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
