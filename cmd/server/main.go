@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	db "github.com/yogapratama23/go-http-server/internal/database"
 	"github.com/yogapratama23/go-http-server/internal/features/category"
+	"github.com/yogapratama23/go-http-server/internal/middlewares"
 )
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 	addr := fmt.Sprintf(":%s", port)
 
 	r := mux.NewRouter()
+	r.Use(middlewares.Logging)
 	// register routes
 	r.HandleFunc("/", home).Methods("GET")
 	category.CategoryRouters(r)
