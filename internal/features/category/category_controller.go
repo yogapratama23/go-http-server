@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/yogapratama23/go-http-server/internal/constants/message"
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
@@ -33,7 +34,7 @@ func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	response.Success(w, "Create category success!", http.StatusCreated, nil)
+	response.Success(w, message.CreateCategorySuccess, http.StatusCreated, nil)
 }
 
 func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +46,7 @@ func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	response.Pagination(w, "Find all categories", http.StatusOK, data.Categories, pagination, data.Total)
+	response.Pagination(w, message.FindAllCategories, http.StatusOK, data.Categories, pagination, data.Total)
 }
 
 func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +62,7 @@ func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	response.Success(w, "Delete category success!", http.StatusOK, nil)
+	response.Success(w, message.DeleteCategorySuccess, http.StatusOK, nil)
 }
 
 func (c *CategoryController) handleUpdate(w http.ResponseWriter, r *http.Request) {
@@ -77,5 +78,5 @@ func (c *CategoryController) handleUpdate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	response.Success(w, "Update category success!", http.StatusOK, nil)
+	response.Success(w, message.UpdateCategorySuccess, http.StatusOK, nil)
 }

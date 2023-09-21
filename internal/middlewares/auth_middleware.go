@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/yogapratama23/go-http-server/internal/constants/message"
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
@@ -34,14 +35,16 @@ func Auth(h http.Handler) http.Handler {
 		if !found {
 			authorization := r.Header.Get("Authorization")
 			if authorization == "" {
-				response.Error(w, "Unauthorized access!", http.StatusForbidden)
+				response.Error(w, message.Unauthorized, http.StatusForbidden)
 				return
 			}
 			bearer := strings.Split(authorization, " ")
 			if (len(bearer) < 2) || (bearer[1] == "") {
-				response.Error(w, "Unauthorized access!", http.StatusForbidden)
+				response.Error(w, message.Unauthorized, http.StatusForbidden)
 				return
 			}
+
+			// logic of verifying user here
 		}
 
 		h.ServeHTTP(w, r)
