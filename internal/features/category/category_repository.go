@@ -6,7 +6,6 @@ import (
 	"time"
 
 	db "github.com/yogapratama23/go-http-server/internal/database"
-	"github.com/yogapratama23/go-http-server/internal/models"
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
@@ -14,7 +13,7 @@ type CategoryRepository struct{}
 
 func (r *CategoryRepository) FindAllPaginate(p *response.PaginationInput, wc *FindAllWhereCond) (*ListCategoryResponse, error) {
 	params := []interface{}{}
-	paramsCount := []interface{}{}
+	countParams := []interface{}{}
 	var response ListCategoryResponse
 	query := `
 		SELECT
@@ -37,14 +36,14 @@ func (r *CategoryRepository) FindAllPaginate(p *response.PaginationInput, wc *Fi
 		query += " AND id = ?"
 		queryCount += " AND id = ?"
 		params = append(params, wc.Id)
-		paramsCount = append(paramsCount, wc.Id)
+		countParams = append(countParams, wc.Id)
 	}
 
 	if wc.Search != "" {
 		query += ` AND name like CONCAT('%', ?, '%')`
 		queryCount += ` AND name like CONCAT('%', ?, '%')`
 		params = append(params, wc.Search)
-		paramsCount = append(paramsCount, wc.Search)
+		countParams = append(countParams, wc.Search)
 	}
 
 	if (p.Skip != 0) && (p.Take != 0) {
@@ -77,7 +76,7 @@ func (r *CategoryRepository) FindAllPaginate(p *response.PaginationInput, wc *Fi
 	}
 
 	// query for pagination
-	err = db.Connect.QueryRow(queryCount, paramsCount...).Scan(&response.Total)
+	err = db.Connect.QueryRow(queryCount, countParams...).Scan(&response.Total)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
@@ -87,11 +86,7 @@ func (r *CategoryRepository) FindAllPaginate(p *response.PaginationInput, wc *Fi
 }
 
 func (r *CategoryRepository) Create(p *CreateCategoryInput) error {
-	payload := models.Category{
-		Name:      p.Name,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	params := []interface{}{p.Name, time.Now(), time.Now()}
 
 	_, err := db.Connect.Exec(`
 		INSERT INTO 
@@ -101,7 +96,7 @@ func (r *CategoryRepository) Create(p *CreateCategoryInput) error {
 		VALUES (
 			?, ?, ?
 		)
-	`, payload.Name, payload.CreatedAt, payload.UpdatedAt)
+	`, params...)
 	if err != nil {
 		log.Println(err)
 		return errors.New("create category failed")

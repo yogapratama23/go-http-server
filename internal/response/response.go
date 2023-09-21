@@ -34,15 +34,20 @@ func Success(w http.ResponseWriter, msg string, code int, data interface{}) {
 }
 
 func Pagination(w http.ResponseWriter, msg string, code int, data interface{}, p *PaginationInput, total int) {
-	if (p.Skip == 0) && (p.Take == 0) {
-		p.Skip = 0
-		p.Take = 10
+	page := 1
+	perPage := total
+	pageCount := 1
+
+	if (p.Skip != 0) && (p.Take != 0) {
+		page = int(math.Ceil(float64(p.Skip)/float64(p.Take))) + 1
+		perPage = p.Take
+		pageCount = int(math.Ceil(float64(total) / float64(p.Take)))
 	}
 
 	pagination := map[string]interface{}{
-		"page":       int(math.Ceil(float64(p.Skip)/float64(p.Take))) + 1,
-		"per_page":   p.Take,
-		"page_count": int(math.Ceil(float64(total) / float64(p.Take))),
+		"page":       page,
+		"per_page":   perPage,
+		"page_count": pageCount,
 		"total":      total,
 	}
 

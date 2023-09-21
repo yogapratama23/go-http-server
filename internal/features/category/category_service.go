@@ -11,10 +11,6 @@ type CategoryService struct {
 }
 
 func (s *CategoryService) FindAll(p *response.PaginationInput, wc *FindAllWhereCond) (*ListCategoryResponse, error) {
-	if (p.Skip == 0) && (p.Take == 0) {
-		p.Skip = 0
-		p.Take = 10
-	}
 	categories, err := s.categoryRepo.FindAllPaginate(p, wc)
 	if err != nil {
 		return nil, err
