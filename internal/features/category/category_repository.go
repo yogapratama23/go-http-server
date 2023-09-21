@@ -51,6 +51,7 @@ func (r *CategoryRepository) FindAll(p *response.PaginationInput, wc *FindAllWhe
 		params = append(params, p.Skip)
 		params = append(params, p.Take)
 	}
+
 	// query for data
 	rows, err := db.Connect.Query(query, params...)
 	if err != nil {
@@ -118,6 +119,32 @@ func (r *CategoryRepository) SoftDelete(id *int) error {
 	if err != nil {
 		log.Println(err)
 		return errors.New("delete category failed")
+	}
+
+	return nil
+}
+
+func (r *CategoryRepository) Update(id *int, p *UpdateCategoryInput) error {
+	params := []interface{}{time.Now()}
+	query := `
+		UPDATE
+			categories
+		SET
+			updated_at = ?
+	`
+
+	if p.Name != "" {
+		query += " , name = ?"
+		params = append(params, p.Name)
+	}
+
+	query += ` WHERE id = ?`
+	params = append(params, id)
+
+	_, err := db.Connect.Exec(query, params...)
+	if err != nil {
+		log.Println(err)
+		return errors.New("update category failed")
 	}
 
 	return nil

@@ -26,15 +26,15 @@ func (v *CategoryValidator) CreatePayload(r *http.Request) (*CreateCategoryInput
 	return &payload, nil
 }
 
-func (v *CategoryValidator) DeletePayload(r *http.Request) (int, error) {
+func (v *CategoryValidator) DeletePayload(r *http.Request) (*int, error) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 
 	if id == 0 {
-		return 0, errors.New("id is required")
+		return &id, errors.New("id is required")
 	}
 
-	return id, nil
+	return &id, nil
 }
 
 func (v *CategoryValidator) FindAllPayload(r *http.Request) (*response.PaginationInput, *FindAllWhereCond) {
@@ -54,4 +54,25 @@ func (v *CategoryValidator) FindAllPayload(r *http.Request) (*response.Paginatio
 	}
 
 	return pagination, whereCondition
+}
+
+func (v *CategoryValidator) UpdatePayload(r *http.Request) (*int, *UpdateCategoryInput, error) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+
+	if id == 0 {
+		return &id, nil, errors.New("id is required")
+	}
+
+	var payload UpdateCategoryInput
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if payload.Name == "" {
+		return nil, nil, errors.New("name is required")
+	}
+
+	return &id, &payload, nil
 }

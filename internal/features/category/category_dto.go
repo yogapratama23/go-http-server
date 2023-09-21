@@ -18,3 +18,7 @@ type FindAllWhereCond struct {
 	Id     int
 	Search string
 }
+
+type UpdateCategoryInput struct {
+	Name string `json:"name"`
+}

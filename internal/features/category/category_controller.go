@@ -8,8 +8,8 @@ import (
 )
 
 type CategoryController struct {
-	categoryService CategoryService
-	validate        CategoryValidator
+	service   CategoryService
+	validator CategoryValidator
 }
 
 func CategoryRouters(r *mux.Router) {
@@ -17,16 +17,17 @@ func CategoryRouters(r *mux.Router) {
 	r.HandleFunc("/category", controller.handleCreate).Methods("POST")
 	r.HandleFunc("/category", controller.handleFindAll).Methods("GET")
 	r.HandleFunc("/category/{id}", controller.handleDelete).Methods("DELETE")
+	r.HandleFunc("/category/{id}", controller.handleUpdate).Methods("PUT")
 }
 
 func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request) {
-	payload, err := c.validate.CreatePayload(r)
+	payload, err := c.validator.CreatePayload(r)
 	if err != nil {
 		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = c.categoryService.Create(payload)
+	err = c.service.Create(payload)
 	if err != nil {
 		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -36,9 +37,9 @@ func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request
 }
 
 func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Request) {
-	pagination, whereCondition := c.validate.FindAllPayload(r)
+	pagination, whereCondition := c.validator.FindAllPayload(r)
 
-	data, err := c.categoryService.FindAll(pagination, whereCondition)
+	data, err := c.service.FindAll(pagination, whereCondition)
 	if err != nil {
 		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -48,17 +49,33 @@ func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Reques
 }
 
 func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request) {
-	id, err := c.validate.DeletePayload(r)
+	id, err := c.validator.DeletePayload(r)
 	if err != nil {
 		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = c.categoryService.SoftDelete(id)
+	err = c.service.SoftDelete(id)
 	if err != nil {
 		response.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	response.Success(w, "Delete category success!", http.StatusOK, nil)
+}
+
+func (c *CategoryController) handleUpdate(w http.ResponseWriter, r *http.Request) {
+	id, payload, err := c.validator.UpdatePayload(r)
+	if err != nil {
+		response.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = c.service.Update(id, payload)
+	if err != nil {
+		response.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response.Success(w, "Update category success!", http.StatusOK, nil)
 }

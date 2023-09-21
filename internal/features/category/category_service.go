@@ -26,8 +26,17 @@ func (s *CategoryService) Create(p *CreateCategoryInput) error {
 	return nil
 }
 
-func (s *CategoryService) SoftDelete(id int) error {
-	err := s.categoryRepo.SoftDelete(&id)
+func (s *CategoryService) SoftDelete(id *int) error {
+	err := s.categoryRepo.SoftDelete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *CategoryService) Update(id *int, p *UpdateCategoryInput) error {
+	err := s.categoryRepo.Update(id, p)
 	if err != nil {
 		return err
 	}
