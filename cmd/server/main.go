@@ -13,6 +13,7 @@ import (
 	db "github.com/yogapratama23/go-http-server/internal/database"
 	"github.com/yogapratama23/go-http-server/internal/features/auth"
 	"github.com/yogapratama23/go-http-server/internal/features/category"
+	"github.com/yogapratama23/go-http-server/internal/features/product"
 	"github.com/yogapratama23/go-http-server/internal/middlewares"
 )
 
@@ -40,6 +41,7 @@ func main() {
 	r.HandleFunc("/", home).Methods("GET")
 	category.CategoryRouters(r)
 	auth.AuthRouters(r)
+	product.ProductRouters(r)
 
 	http.ListenAndServe(addr, r)
 }
