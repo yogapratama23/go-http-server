@@ -1,10 +1,12 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/yogapratama23/go-http-server/internal/constants/message"
+	"github.com/yogapratama23/go-http-server/internal/features/auth"
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
@@ -13,11 +15,21 @@ type ExcludeRoutes struct {
 	Method string
 }
 
+type UserInfo struct {
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+}
+
+type ContextKey string
+
 func Auth(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authRepo := new(auth.AuthRepository)
 		found := false
 		excludeRoutes := []ExcludeRoutes{
 			{Url: "/", Method: "GET"},
+			{Url: "/signin", Method: "POST"},
+			{Url: "/signup", Method: "POST"},
 		}
 
 		route := ExcludeRoutes{
@@ -44,7 +56,30 @@ func Auth(h http.Handler) http.Handler {
 				return
 			}
 
-			// logic of verifying user here
+			token := bearer[1]
+			newToken, err := authRepo.FindToken(token)
+			if err != nil {
+				response.Error(w, err.Error(), http.StatusForbidden)
+				return
+			}
+
+			user, err := authRepo.FindById(&newToken.UserId)
+			if err != nil {
+				response.Error(w, err.Error(), http.StatusForbidden)
+				return
+			}
+
+			newUser := UserInfo{
+				ID:       user.ID,
+				Username: user.Username,
+			}
+
+			// get context data in controller user := r.Context().Value(middlewares.ContextKey("user"))
+			ctxKey := ContextKey("user")
+			newCtx := context.WithValue(r.Context(), ctxKey, newUser)
+
+			h.ServeHTTP(w, r.WithContext(newCtx))
+			return
 		}
 
 		h.ServeHTTP(w, r)

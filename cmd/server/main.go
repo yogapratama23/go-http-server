@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/yogapratama23/go-http-server/internal/constants/message"
 	db "github.com/yogapratama23/go-http-server/internal/database"
+	"github.com/yogapratama23/go-http-server/internal/features/auth"
 	"github.com/yogapratama23/go-http-server/internal/features/category"
 	"github.com/yogapratama23/go-http-server/internal/middlewares"
 )
@@ -38,6 +39,7 @@ func main() {
 	// register routes
 	r.HandleFunc("/", home).Methods("GET")
 	category.CategoryRouters(r)
+	auth.AuthRouters(r)
 
 	http.ListenAndServe(addr, r)
 }

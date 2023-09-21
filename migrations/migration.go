@@ -18,6 +18,8 @@ func main() {
 
 	createCategories()
 	createProducts()
+	createUsers()
+	createTokens()
 }
 
 func createCategories() {
@@ -49,6 +51,43 @@ func createProducts() {
 			FOREIGN KEY (category_id) REFERENCES categories(id)
 		);
 	`
+	if _, err := db.Connect.Exec(query); err != nil {
+		log.Println(err)
+	}
+}
+
+func createUsers() {
+	query := `
+		CREATE TABLE IF NOT EXISTS users (
+			id INT AUTO_INCREMENT,
+			username VARCHAR(255),
+			password VARCHAR(255),
+			created_at DATETIME,
+			updated_at DATETIME,
+			deleted_at DATETIME,
+			PRIMARY KEY (id)
+		);
+	`
+
+	if _, err := db.Connect.Exec(query); err != nil {
+		log.Println(err)
+	}
+}
+
+func createTokens() {
+	query := `
+		CREATE TABLE IF NOT EXISTS tokens (
+			id INT AUTO_INCREMENT,
+			token VARCHAR(255),
+			user_id INT,
+			created_at DATETIME,
+			updated_at DATETIME,
+			deleted_at DATETIME,
+			PRIMARY KEY (id),
+			FOREIGN KEY (user_id) REFERENCES users(id)
+		);
+	`
+
 	if _, err := db.Connect.Exec(query); err != nil {
 		log.Println(err)
 	}

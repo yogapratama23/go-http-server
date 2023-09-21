@@ -15,10 +15,10 @@ type CategoryController struct {
 
 func CategoryRouters(r *mux.Router) {
 	controller := new(CategoryController)
-	r.HandleFunc("/category", controller.handleCreate).Methods("POST")
-	r.HandleFunc("/category", controller.handleFindAll).Methods("GET")
-	r.HandleFunc("/category/{id}", controller.handleDelete).Methods("DELETE")
-	r.HandleFunc("/category/{id}", controller.handleUpdate).Methods("PUT")
+	r.HandleFunc("/category", controller.handleCreate).Methods(http.MethodPost)
+	r.HandleFunc("/category", controller.handleFindAll).Methods(http.MethodGet)
+	r.HandleFunc("/category/{id}", controller.handleDelete).Methods(http.MethodDelete)
+	r.HandleFunc("/category/{id}", controller.handleUpdate).Methods(http.MethodPut)
 }
 
 func (c *CategoryController) handleCreate(w http.ResponseWriter, r *http.Request) {
