@@ -15,13 +15,6 @@ type ExcludeRoutes struct {
 	Method string
 }
 
-type UserInfo struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-}
-
-type ContextKey string
-
 func Auth(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authRepo := new(auth.AuthRepository)
@@ -69,13 +62,13 @@ func Auth(h http.Handler) http.Handler {
 				return
 			}
 
-			newUser := UserInfo{
+			newUser := auth.UserInfo{
 				ID:       user.ID,
 				Username: user.Username,
 			}
 
 			// get context data in controller user := r.Context().Value(middlewares.ContextKey("user"))
-			ctxKey := ContextKey("user")
+			ctxKey := auth.ContextKey("user")
 			newCtx := context.WithValue(r.Context(), ctxKey, newUser)
 
 			h.ServeHTTP(w, r.WithContext(newCtx))

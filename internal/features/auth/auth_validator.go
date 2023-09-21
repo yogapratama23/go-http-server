@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 )
 
 type AuthValidator struct{}
@@ -42,4 +43,18 @@ func (v *AuthValidator) SigninPayload(r *http.Request) (*SigninInput, error) {
 	}
 
 	return &payload, nil
+}
+
+func (v *AuthValidator) SignoutPayload(r *http.Request) *SignoutInput {
+	var payload SignoutInput
+	u := r.Context().Value(ContextKey("user"))
+	user := u.(UserInfo)
+	authorization := r.Header.Get("Authorization")
+	bearer := strings.Split(authorization, " ")
+	token := bearer[1]
+
+	payload.ID = user.ID
+	payload.Token = token
+
+	return &payload
 }

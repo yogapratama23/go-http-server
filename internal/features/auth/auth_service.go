@@ -45,6 +45,15 @@ func (s *AuthService) Signin(p *SigninInput) (*string, error) {
 	return &token, nil
 }
 
+func (s *AuthService) Signout(p *SignoutInput) error {
+	err := s.authRepo.SoftDeleteToken(p)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *AuthService) GenerateToken() string {
 	token := "token"
 	str := "abcdefghijklmnopqrstuvwxyz1234567890"

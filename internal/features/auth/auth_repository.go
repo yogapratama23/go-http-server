@@ -122,3 +122,25 @@ func (r *AuthRepository) CreateToken(id *int, token *string) error {
 
 	return nil
 }
+
+func (r *AuthRepository) SoftDeleteToken(p *SignoutInput) error {
+	params := []interface{}{time.Now(), p.Token, p.ID}
+	query := `
+		UPDATE
+			tokens
+		SET
+			deleted_at = ?
+		WHERE
+			token = ?
+		AND
+			user_id = ?
+	`
+
+	_, err := db.Connect.Exec(query, params...)
+	if err != nil {
+		log.Println(err)
+		return errors.New("delete token failed")
+	}
+
+	return nil
+}

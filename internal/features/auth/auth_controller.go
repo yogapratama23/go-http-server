@@ -16,6 +16,7 @@ func AuthRouters(r *mux.Router) {
 	controller := new(AuthController)
 	r.HandleFunc("/signup", controller.handleSignup).Methods(http.MethodPost)
 	r.HandleFunc("/signin", controller.handleSignin).Methods(http.MethodPost)
+	r.HandleFunc("/signout", controller.handleSignout).Methods(http.MethodPost)
 }
 
 func (c *AuthController) handleSignup(w http.ResponseWriter, r *http.Request) {
@@ -48,4 +49,15 @@ func (c *AuthController) handleSignin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, "signin success", http.StatusCreated, token)
+}
+
+func (c *AuthController) handleSignout(w http.ResponseWriter, r *http.Request) {
+	payload := c.validator.SignoutPayload(r)
+	err := c.service.Signout(payload)
+	if err != nil {
+		response.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response.Success(w, "signout success", http.StatusOK, nil)
 }
