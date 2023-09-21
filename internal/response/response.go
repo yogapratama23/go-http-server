@@ -14,6 +14,7 @@ type PaginationInput struct {
 func Error(w http.ResponseWriter, error string, code int) {
 
 	resp, _ := json.Marshal(map[string]interface{}{
+		"code":    code,
 		"message": error,
 	})
 

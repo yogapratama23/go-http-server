@@ -1,8 +1,6 @@
 package category
 
 import (
-	"strconv"
-
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
@@ -11,7 +9,7 @@ type CategoryService struct {
 }
 
 func (s *CategoryService) FindAll(p *response.PaginationInput, wc *FindAllWhereCond) (*ListCategoryResponse, error) {
-	categories, err := s.categoryRepo.FindAllPaginate(p, wc)
+	categories, err := s.categoryRepo.FindAll(p, wc)
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +26,8 @@ func (s *CategoryService) Create(p *CreateCategoryInput) error {
 	return nil
 }
 
-func (s *CategoryService) SoftDelete(id string) error {
-	i, _ := strconv.Atoi(id)
-	err := s.categoryRepo.SoftDelete(&i)
+func (s *CategoryService) SoftDelete(id int) error {
+	err := s.categoryRepo.SoftDelete(&id)
 	if err != nil {
 		return err
 	}

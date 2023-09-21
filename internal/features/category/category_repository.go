@@ -11,7 +11,7 @@ import (
 
 type CategoryRepository struct{}
 
-func (r *CategoryRepository) FindAllPaginate(p *response.PaginationInput, wc *FindAllWhereCond) (*ListCategoryResponse, error) {
+func (r *CategoryRepository) FindAll(p *response.PaginationInput, wc *FindAllWhereCond) (*ListCategoryResponse, error) {
 	params := []interface{}{}
 	countParams := []interface{}{}
 	var response ListCategoryResponse
