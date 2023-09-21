@@ -32,6 +32,7 @@ func main() {
 
 	// register middlewares
 	r.Use(middlewares.Logging)
+	r.Use(middlewares.Auth)
 
 	// register routes
 	r.HandleFunc("/", home).Methods("GET")
