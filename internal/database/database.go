@@ -6,6 +6,7 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/yogapratama23/go-http-server/internal/constants/message"
 )
 
 var Connect *sql.DB
@@ -17,6 +18,6 @@ func Init() {
 		log.Println(err.Error())
 	}
 
-	log.Println("Database connected!")
+	log.Println(message.DatabaseConnected)
 	Connect = db
 }

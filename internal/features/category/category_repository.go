@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/yogapratama23/go-http-server/internal/constants/message"
 	db "github.com/yogapratama23/go-http-server/internal/database"
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
@@ -56,7 +57,7 @@ func (r *CategoryRepository) FindAll(p *response.PaginationInput, wc *FindAllWhe
 	rows, err := db.Connect.Query(query, params...)
 	if err != nil {
 		log.Println(err)
-		return nil, errors.New("error finding list of categories")
+		return nil, errors.New(message.ErrorFindingCategories)
 	}
 	defer rows.Close()
 
@@ -65,7 +66,7 @@ func (r *CategoryRepository) FindAll(p *response.PaginationInput, wc *FindAllWhe
 		err := rows.Scan(&c.ID, &c.Name)
 		if err != nil {
 			log.Println(err)
-			return nil, errors.New("error finding list of categories")
+			return nil, errors.New(message.ErrorFindingCategories)
 		}
 		response.Categories = append(response.Categories, c)
 	}
@@ -73,7 +74,7 @@ func (r *CategoryRepository) FindAll(p *response.PaginationInput, wc *FindAllWhe
 	err = rows.Err()
 	if err != nil {
 		log.Println(err)
-		return nil, errors.New("error finding list of categories")
+		return nil, errors.New(message.ErrorFindingCategories)
 	}
 
 	// query for pagination
@@ -100,7 +101,7 @@ func (r *CategoryRepository) Create(p *CreateCategoryInput) error {
 	`, params...)
 	if err != nil {
 		log.Println(err)
-		return errors.New("create category failed")
+		return errors.New(message.CreateCategoryFailed)
 	}
 
 	return nil
@@ -118,7 +119,7 @@ func (r *CategoryRepository) SoftDelete(id *int) error {
 	`, params...)
 	if err != nil {
 		log.Println(err)
-		return errors.New("delete category failed")
+		return errors.New(message.DeleteCategoryFailed)
 	}
 
 	return nil
@@ -144,7 +145,7 @@ func (r *CategoryRepository) Update(id *int, p *UpdateCategoryInput) error {
 	_, err := db.Connect.Exec(query, params...)
 	if err != nil {
 		log.Println(err)
-		return errors.New("update category failed")
+		return errors.New(message.UpdateCategoryFailed)
 	}
 
 	return nil

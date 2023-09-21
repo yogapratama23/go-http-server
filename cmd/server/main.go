@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/yogapratama23/go-http-server/internal/constants/message"
 	db "github.com/yogapratama23/go-http-server/internal/database"
 	"github.com/yogapratama23/go-http-server/internal/features/category"
 	"github.com/yogapratama23/go-http-server/internal/middlewares"
@@ -18,7 +19,7 @@ func main() {
 	// load env variables
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Failed to load env .file")
+		log.Fatal(message.FailedToLoadEnv)
 	}
 
 	// connect db

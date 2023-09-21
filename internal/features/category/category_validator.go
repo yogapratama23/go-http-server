@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/yogapratama23/go-http-server/internal/constants/message"
 	"github.com/yogapratama23/go-http-server/internal/response"
 )
 
@@ -20,7 +21,7 @@ func (v *CategoryValidator) CreatePayload(r *http.Request) (*CreateCategoryInput
 	}
 
 	if payload.Name == "" {
-		return nil, errors.New("name is required")
+		return nil, errors.New(message.NameRequired)
 	}
 
 	return &payload, nil
@@ -31,7 +32,7 @@ func (v *CategoryValidator) DeletePayload(r *http.Request) (*int, error) {
 	id, _ := strconv.Atoi(vars["id"])
 
 	if id == 0 {
-		return &id, errors.New("id is required")
+		return &id, errors.New(message.IdRequired)
 	}
 
 	return &id, nil
@@ -61,7 +62,7 @@ func (v *CategoryValidator) UpdatePayload(r *http.Request) (*int, *UpdateCategor
 	id, _ := strconv.Atoi(vars["id"])
 
 	if id == 0 {
-		return &id, nil, errors.New("id is required")
+		return &id, nil, errors.New(message.IdRequired)
 	}
 
 	var payload UpdateCategoryInput
@@ -71,7 +72,7 @@ func (v *CategoryValidator) UpdatePayload(r *http.Request) (*int, *UpdateCategor
 	}
 
 	if payload.Name == "" {
-		return nil, nil, errors.New("name is required")
+		return nil, nil, errors.New(message.NameRequired)
 	}
 
 	return &id, &payload, nil
