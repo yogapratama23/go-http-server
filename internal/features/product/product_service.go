@@ -11,3 +11,12 @@ func (s *ProductService) Create(p *CreateProductInput) error {
 
 	return nil
 }
+
+func (s *ProductService) FindAll() (*ListFindAllResponse, error) {
+	products, err := s.productRepo.FindAllWithDetails()
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}

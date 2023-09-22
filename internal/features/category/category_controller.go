@@ -17,6 +17,7 @@ func CategoryRouters(r *mux.Router) {
 	controller := new(CategoryController)
 	r.HandleFunc("/category", controller.handleCreate).Methods(http.MethodPost)
 	r.HandleFunc("/category", controller.handleFindAll).Methods(http.MethodGet)
+	r.HandleFunc("/category-products", controller.handleFindAllWithProducts).Methods(http.MethodGet)
 	r.HandleFunc("/category/{id}", controller.handleDelete).Methods(http.MethodDelete)
 	r.HandleFunc("/category/{id}", controller.handleUpdate).Methods(http.MethodPut)
 }
@@ -47,6 +48,16 @@ func (c *CategoryController) handleFindAll(w http.ResponseWriter, r *http.Reques
 	}
 
 	response.Pagination(w, message.FindAllCategories, http.StatusOK, data.Categories, pagination, data.Total)
+}
+
+func (c *CategoryController) handleFindAllWithProducts(w http.ResponseWriter, r *http.Request) {
+	data, err := c.service.FindAllWithProducts()
+	if err != nil {
+		response.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response.Success(w, "find categories with products", http.StatusOK, data)
 }
 
 func (c *CategoryController) handleDelete(w http.ResponseWriter, r *http.Request) {

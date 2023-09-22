@@ -15,10 +15,22 @@ type ListCategoryResponse struct {
 }
 
 type FindAllWhereCond struct {
-	Id     int
-	Search string
+	Id     int    `json:"id"`
+	Search string `json:"search"`
 }
 
 type UpdateCategoryInput struct {
 	Name string `json:"name"`
+}
+
+type ProductResponse struct {
+	ID         int    `json:"id"`
+	CategoryId int    `json:"category_id"`
+	Name       string `json:"name"`
+}
+
+type FindWithProductsResponse struct {
+	ID       int               `json:"id"`
+	Name     string            `json:"name"`
+	Products []ProductResponse `json:"products"`
 }

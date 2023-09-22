@@ -15,6 +15,7 @@ type ProductController struct {
 func ProductRouters(r *mux.Router) {
 	controller := new(ProductController)
 	r.HandleFunc("/product", controller.handleCreate).Methods(http.MethodPost)
+	r.HandleFunc("/product", controller.handleFindAll).Methods(http.MethodGet)
 }
 
 func (c *ProductController) handleCreate(w http.ResponseWriter, r *http.Request) {
@@ -31,4 +32,14 @@ func (c *ProductController) handleCreate(w http.ResponseWriter, r *http.Request)
 	}
 
 	response.Success(w, "create product success", http.StatusCreated, nil)
+}
+
+func (c *ProductController) handleFindAll(w http.ResponseWriter, r *http.Request) {
+	products, err := c.service.FindAll()
+	if err != nil {
+		response.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response.Success(w, "find all products with details", http.StatusOK, products)
 }

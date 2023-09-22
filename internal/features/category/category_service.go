@@ -17,6 +17,15 @@ func (s *CategoryService) FindAll(p *response.PaginationInput, wc *FindAllWhereC
 	return categories, nil
 }
 
+func (s *CategoryService) FindAllWithProducts() (*[]FindWithProductsResponse, error) {
+	cp, err := s.categoryRepo.FindAllWithProducts()
+	if err != nil {
+		return nil, err
+	}
+
+	return cp, nil
+}
+
 func (s *CategoryService) Create(p *CreateCategoryInput) error {
 	err := s.categoryRepo.Create(p)
 	if err != nil {
