@@ -87,6 +87,7 @@ func (r *CategoryRepository) FindAll(p *response.PaginationInput, wc *FindAllWhe
 	return &response, nil
 }
 
+// ineffective for pagination but blazingly fast
 func (r *CategoryRepository) FindAllWithProducts() (*[]FindWithProductsResponse, error) {
 	var response []FindWithProductsResponse
 	query := `
@@ -152,6 +153,75 @@ func (r *CategoryRepository) FindAllWithProducts() (*[]FindWithProductsResponse,
 		return nil, errors.New(message.ErrorFindingCategories)
 	}
 
+	return &response, nil
+}
+
+// effective for pagination but 4times slower
+func (r *CategoryRepository) FindAllWithProducts2() (*[]FindWithProductsResponse, error) {
+	var response []FindWithProductsResponse
+	rows, err := db.Connect.Query(`
+		SELECT
+			id, name
+		FROM
+			categories
+		WHERE
+			deleted_at IS NULL
+	`)
+	defer rows.Close()
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New(message.ErrorFindingCategories)
+	}
+
+	for rows.Next() {
+		var c FindWithProductsResponse
+		err := rows.Scan(&c.ID, &c.Name)
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New(message.ErrorFindingCategories)
+		}
+
+		rows2, err := db.Connect.Query(`
+			SELECT
+				id, name
+			FROM
+				products
+			WHERE
+				deleted_at IS NULL
+			AND
+				category_id = ?
+		`, c.ID)
+		defer rows2.Close()
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New(message.ErrorFindingCategories)
+		}
+
+		for rows2.Next() {
+			var p ProductResponse
+			err := rows2.Scan(&p.ID, &p.Name)
+			if err != nil {
+				log.Println(err)
+				return nil, errors.New(message.ErrorFindingCategories)
+			}
+
+			c.Products = append(c.Products, p)
+		}
+
+		err = rows2.Err()
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New(message.ErrorFindingCategories)
+		}
+
+		response = append(response, c)
+
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 	return &response, nil
 }
 
