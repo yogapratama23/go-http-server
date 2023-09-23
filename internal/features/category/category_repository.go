@@ -99,6 +99,7 @@ func (r *CategoryRepository) FindAllWithProducts() (*[]FindWithProductsResponse,
 			products AS p ON c.id = p.category_id
 		WHERE
 			c.deleted_at IS NULL
+		LIMIT 10
 	`
 
 	rows, err := db.Connect.Query(query)
@@ -156,7 +157,7 @@ func (r *CategoryRepository) FindAllWithProducts() (*[]FindWithProductsResponse,
 	return &response, nil
 }
 
-// effective for pagination but 4times slower
+// effective for pagination but 4times slower even with indexes
 func (r *CategoryRepository) FindAllWithProducts2() (*[]FindWithProductsResponse, error) {
 	var response []FindWithProductsResponse
 	rows, err := db.Connect.Query(`

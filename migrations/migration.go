@@ -20,6 +20,7 @@ func main() {
 	createProducts()
 	createUsers()
 	createTokens()
+	indexCategoryIdProducts()
 }
 
 func createCategories() {
@@ -86,6 +87,19 @@ func createTokens() {
 			PRIMARY KEY (id),
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
+	`
+
+	if _, err := db.Connect.Exec(query); err != nil {
+		log.Println(err)
+	}
+}
+
+func indexCategoryIdProducts() {
+	query := `
+		CREATE INDEX
+			idx_category_id
+		ON
+			products (category_id)
 	`
 
 	if _, err := db.Connect.Exec(query); err != nil {
