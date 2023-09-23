@@ -167,11 +167,11 @@ func (r *CategoryRepository) FindAllWithProducts2() (*[]FindWithProductsResponse
 		WHERE
 			deleted_at IS NULL
 	`)
-	defer rows.Close()
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New(message.ErrorFindingCategories)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var c FindWithProductsResponse
@@ -191,11 +191,12 @@ func (r *CategoryRepository) FindAllWithProducts2() (*[]FindWithProductsResponse
 			AND
 				category_id = ?
 		`, c.ID)
-		defer rows2.Close()
 		if err != nil {
 			log.Println(err)
 			return nil, errors.New(message.ErrorFindingCategories)
 		}
+
+		defer rows2.Close()
 
 		for rows2.Next() {
 			var p ProductResponse
